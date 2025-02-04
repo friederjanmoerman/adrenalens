@@ -1,16 +1,13 @@
-import { Geist, Geist_Mono } from "next/font/google"
+"use client"
+
 import "./globals.css"
+import { ThemeProvider, createTheme } from "@mui/material/styles"
+import CssBaseline from "@mui/material/CssBaseline"
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-  display: "swap",
-})
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-  display: "swap",
+const theme = createTheme({
+  palette: {
+    mode: "dark", // Change to "dark" if needed
+  },
 })
 
 export default function RootLayout({
@@ -20,7 +17,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>{children}</body>
+      <body>
+        <ThemeProvider theme={theme}>
+          <CssBaseline /> {/* Resets default styles for consistency */}
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   )
 }
