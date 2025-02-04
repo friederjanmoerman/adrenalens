@@ -1,7 +1,9 @@
 "use client"
+
 import React, { useEffect, useState } from "react"
 import { createClient } from "@/utils/supabase/client"
 import Image from "next/image"
+import { Avatar as MuiAvatar, Button, Box, CircularProgress } from "@mui/material"
 
 export default function Avatar({
   uid,
@@ -63,35 +65,21 @@ export default function Avatar({
   }
 
   return (
-    <div>
+    <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
       {avatarUrl ? (
-        <Image
-          width={size}
-          height={size}
-          src={avatarUrl}
-          alt="Avatar"
-          className="avatar image"
-          style={{ height: size, width: size }}
-        />
+        <MuiAvatar src={avatarUrl} sx={{ width: size, height: size }} alt="Avatar" />
       ) : (
-        <div className="avatar no-image" style={{ height: size, width: size }} />
+        <MuiAvatar sx={{ width: size, height: size, backgroundColor: "grey.300" }} />
       )}
-      <div style={{ width: size }}>
-        <label className="button primary block" htmlFor="single">
-          {uploading ? "Uploading ..." : "Upload"}
-        </label>
-        <input
-          style={{
-            visibility: "hidden",
-            position: "absolute",
-          }}
-          type="file"
-          id="single"
-          accept="image/*"
-          onChange={uploadAvatar}
-          disabled={uploading}
-        />
-      </div>
-    </div>
+      <Button
+        variant="contained"
+        component="label"
+        disabled={uploading}
+        startIcon={uploading && <CircularProgress size={20} />}
+      >
+        {uploading ? "Uploading ..." : "Upload"}
+        <input type="file" hidden accept="image/*" onChange={uploadAvatar} disabled={uploading} />
+      </Button>
+    </Box>
   )
 }

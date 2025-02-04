@@ -1,8 +1,10 @@
 "use client"
+
 import { useCallback, useEffect, useState } from "react"
 import { createClient } from "@/utils/supabase/client"
 import { type User } from "@supabase/supabase-js"
 import Avatar from "./avatar"
+import { TextField, Button, Box, Container, Typography, CircularProgress } from "@mui/material"
 
 export default function AccountForm({ user }: { user: User | null }) {
   const supabase = createClient()
@@ -15,10 +17,9 @@ export default function AccountForm({ user }: { user: User | null }) {
   const getProfile = useCallback(async () => {
     try {
       setLoading(true)
-
       const { data, error, status } = await supabase
         .from("profiles")
-        .select(`full_name, username, website, avatar_url`)
+        .select("full_name, username, website, avatar_url")
         .eq("id", user?.id)
         .single()
 
@@ -44,19 +45,9 @@ export default function AccountForm({ user }: { user: User | null }) {
     getProfile()
   }, [user, getProfile])
 
-  async function updateProfile({
-    username,
-    website,
-    avatar_url,
-  }: {
-    username: string | null
-    fullname: string | null
-    website: string | null
-    avatar_url: string | null
-  }) {
+  async function updateProfile() {
     try {
       setLoading(true)
-
       const { error } = await supabase.from("profiles").upsert({
         id: user?.id as string,
         full_name: fullname,
@@ -75,51 +66,54 @@ export default function AccountForm({ user }: { user: User | null }) {
   }
 
   return (
-    <div className="form-widget">
-      <Avatar
-        uid={user?.id ?? null}
-        url={avatar_url}
-        size={150}
-        onUpload={url => {
-          setAvatarUrl(url)
-          updateProfile({ fullname, username, website, avatar_url: url })
-        }}
-      />
+    <Container maxWidth="sm">
+      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2, mt: 4 }}>
+        <Avatar
+          uid={user?.id ?? null}
+          url={avatar_url}
+          size={150}
+          onUpload={url => {
+            setAvatarUrl(url)
+            updateProfile()
+          }}
+        />
 
-      <div>
-        <label htmlFor="email">Email</label>
-        <input id="email" type="text" value={user?.email} disabled />
-      </div>
-      <div>
-        <label htmlFor="fullName">Full Name</label>
-        <input id="fullName" type="text" value={fullname || ""} onChange={e => setFullname(e.target.value)} />
-      </div>
-      <div>
-        <label htmlFor="username">Username</label>
-        <input id="username" type="text" value={username || ""} onChange={e => setUsername(e.target.value)} />
-      </div>
-      <div>
-        <label htmlFor="website">Website</label>
-        <input id="website" type="url" value={website || ""} onChange={e => setWebsite(e.target.value)} />
-      </div>
+        <Typography variant="h6">Profile Information</Typography>
 
-      <div>
-        <button
-          className="button primary block"
-          onClick={() => updateProfile({ fullname, username, website, avatar_url })}
-          disabled={loading}
-        >
-          {loading ? "Loading ..." : "Update"}
-        </button>
-      </div>
+        <TextField id="email" label="Email" type="text" value={user?.email} disabled fullWidth />
+        <TextField
+          id="fullName"
+          label="Full Name"
+          type="text"
+          value={fullname || ""}
+          onChange={e => setFullname(e.target.value)}
+          fullWidth
+        />
+        <TextField
+          id="username"
+          label="Username"
+          type="text"
+          value={username || ""}
+          onChange={e => setUsername(e.target.value)}
+          fullWidth
+        />
+        <TextField
+          id="website"
+          label="Website"
+          type="url"
+          value={website || ""}
+          onChange={e => setWebsite(e.target.value)}
+          fullWidth
+        />
 
-      <div>
-        <form action="/auth/signout" method="post">
-          <button className="button block" type="submit">
-            Sign out
-          </button>
-        </form>
-      </div>
-    </div>
+        <Button variant="contained" color="primary" onClick={updateProfile} disabled={loading} fullWidth>
+          {loading ? <CircularProgress size={24} /> : "Update"}
+        </Button>
+
+        <Button variant="outlined" color="secondary" href="/auth/signout" fullWidth>
+          Sign Out
+        </Button>
+      </Box>
+    </Container>
   )
 }
