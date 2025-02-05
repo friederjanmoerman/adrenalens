@@ -1,7 +1,13 @@
-import type { NextConfig } from "next";
+const nextConfig: import("next").NextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "kdkaolvfpgoxgydcdqor.supabase.co",
+        pathname: "/storage/v1/object/public/images/**",
+      },
+    ],
+  },
+}
 
-const nextConfig: NextConfig = {
-  /* config options here */
-};
-
-export default nextConfig;
+module.exports = nextConfig

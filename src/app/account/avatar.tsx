@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react"
 import { createClient } from "@/utils/supabase/client"
-import Image from "next/image"
 import { Avatar as MuiAvatar, Button, Box, CircularProgress } from "@mui/material"
 
 export default function Avatar({

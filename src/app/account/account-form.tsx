@@ -4,7 +4,9 @@ import { useCallback, useEffect, useState } from "react"
 import { createClient } from "@/utils/supabase/client"
 import { type User } from "@supabase/supabase-js"
 import Avatar from "./avatar"
+import ImageUpload from "./gallery"
 import { TextField, Button, Box, Container, Typography, CircularProgress } from "@mui/material"
+import Image from "next/image"
 
 export default function AccountForm({ user }: { user: User | null }) {
   const supabase = createClient()
@@ -13,6 +15,7 @@ export default function AccountForm({ user }: { user: User | null }) {
   const [username, setUsername] = useState<string | null>(null)
   const [website, setWebsite] = useState<string | null>(null)
   const [avatar_url, setAvatarUrl] = useState<string | null>(null)
+  const [imageUrls, setImageUrls] = useState<string[]>([])
 
   const getProfile = useCallback(async () => {
     try {
@@ -105,6 +108,26 @@ export default function AccountForm({ user }: { user: User | null }) {
           onChange={e => setWebsite(e.target.value)}
           fullWidth
         />
+
+        <Typography variant="h6" sx={{ mt: 4 }}>
+          Upload Image to Gallery
+        </Typography>
+        <ImageUpload onUpload={url => setImageUrls(prev => [...prev, url])} />
+
+        {imageUrls.length > 0 && (
+          <Box sx={{ mt: 2, display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))", gap: 2 }}>
+            {imageUrls.map((url, index) => (
+              <Image
+                key={index}
+                src={url}
+                alt={`Uploaded ${index}`}
+                width={200}
+                height={200}
+                style={{ objectFit: "cover", borderRadius: "8px" }}
+              />
+            ))}
+          </Box>
+        )}
 
         <Button variant="contained" color="primary" onClick={updateProfile} disabled={loading} fullWidth>
           {loading ? <CircularProgress size={24} /> : "Update"}
