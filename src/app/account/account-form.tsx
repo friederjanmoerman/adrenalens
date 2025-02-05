@@ -20,25 +20,38 @@ export default function AccountForm({ user }: { user: User | null }) {
   const getProfile = useCallback(async () => {
     try {
       setLoading(true)
-      const { data, error, status } = await supabase
+
+      // Fetch user profile
+      const { data: profileData, error: profileError } = await supabase
         .from("profiles")
         .select("full_name, username, website, avatar_url")
         .eq("id", user?.id)
         .single()
 
-      if (error && status !== 406) {
-        console.log(error)
-        throw error
+      if (profileError && profileError.code !== "PGRST116") {
+        throw profileError
       }
 
-      if (data) {
-        setFullname(data.full_name)
-        setUsername(data.username)
-        setWebsite(data.website)
-        setAvatarUrl(data.avatar_url)
+      if (profileData) {
+        setFullname(profileData.full_name)
+        setUsername(profileData.username)
+        setWebsite(profileData.website)
+        setAvatarUrl(profileData.avatar_url)
+      }
+
+      // Fetch stored images from the gallery
+      const { data: images, error: imageError } = await supabase
+        .from("gallery")
+        .select("image_url")
+        .eq("user_id", user?.id)
+
+      if (imageError) throw imageError
+
+      if (images) {
+        setImageUrls(images.map(img => img.image_url))
       }
     } catch (error) {
-      alert("Error loading user data!")
+      console.error("Error loading user data:", error)
     } finally {
       setLoading(false)
     }
@@ -112,7 +125,7 @@ export default function AccountForm({ user }: { user: User | null }) {
         <Typography variant="h6" sx={{ mt: 4 }}>
           Upload Image to Gallery
         </Typography>
-        <ImageUpload onUpload={url => setImageUrls(prev => [...prev, url])} />
+        <ImageUpload userId={user?.id ?? null} onUpload={url => setImageUrls(prev => [...prev, url])} />
 
         {imageUrls.length > 0 && (
           <Box sx={{ mt: 2, display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(100px, 1fr))", gap: 2 }}>

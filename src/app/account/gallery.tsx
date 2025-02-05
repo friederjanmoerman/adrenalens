@@ -4,7 +4,7 @@ import React, { useState } from "react"
 import { createClient } from "@/utils/supabase/client"
 import { Button, Box, CircularProgress, Typography } from "@mui/material"
 
-export default function ImageUpload({ onUpload }: { onUpload: (url: string) => void }) {
+export default function ImageUpload({ userId, onUpload }: { userId: string | null; onUpload: (url: string) => void }) {
   const supabase = createClient()
   const [uploading, setUploading] = useState(false)
   const [imageUrl, setImageUrl] = useState<string | null>(null)
@@ -19,7 +19,7 @@ export default function ImageUpload({ onUpload }: { onUpload: (url: string) => v
 
       const file = event.target.files[0]
       const fileExt = file.name.split(".").pop()
-      const filePath = `uploads/${Date.now()}-${Math.random()}.${fileExt}`
+      const filePath = `uploads/${userId}/${Date.now()}-${Math.random()}.${fileExt}`
 
       const { data, error: uploadError } = await supabase.storage.from("images").upload(filePath, file, {
         upsert: true,
@@ -30,6 +30,17 @@ export default function ImageUpload({ onUpload }: { onUpload: (url: string) => v
       }
 
       const publicUrl = supabase.storage.from("images").getPublicUrl(filePath).data.publicUrl
+
+      // Save the image URL in the `gallery` table in Supabase
+      const { error: dbError } = await supabase.from("gallery").insert({
+        user_id: userId,
+        image_url: publicUrl,
+      })
+
+      if (dbError) {
+        throw dbError
+      }
+
       onUpload(publicUrl)
       setImageUrl(publicUrl)
     } catch (error) {
