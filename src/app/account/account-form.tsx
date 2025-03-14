@@ -7,6 +7,7 @@ import Avatar from "./avatar"
 import ImageUpload from "./gallery"
 import { TextField, Button, Box, Container, Typography, CircularProgress } from "@mui/material"
 import Image from "next/image"
+import SignOutButton from "../components/SignOutButton/SignOutButton"
 
 export default function AccountForm({ user }: { user: User | null }) {
   const supabase = createClient()
@@ -146,9 +147,7 @@ export default function AccountForm({ user }: { user: User | null }) {
           {loading ? <CircularProgress size={24} /> : "Update"}
         </Button>
 
-        <Button variant="outlined" color="secondary" href="/auth/signout" fullWidth>
-          Sign Out
-        </Button>
+        <SignOutButton />
       </Box>
     </Container>
   )

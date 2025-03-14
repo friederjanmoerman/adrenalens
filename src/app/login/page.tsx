@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import { login, signup } from "./actions"
-import { TextField, Button, Box, Container } from "@mui/material"
+import { TextField, Button, Box, Container, Typography } from "@mui/material"
+import Link from "next/link"
 
 export default function LoginPage(): JSX.Element {
   const [email, setEmail] = useState("")
@@ -63,6 +64,11 @@ export default function LoginPage(): JSX.Element {
         <Button variant="outlined" color="secondary" type="submit" name="signup" disabled={loading}>
           {loading ? "Signing up..." : "Sign up"}
         </Button>
+        <Typography variant="body2" sx={{ mt: 2 }}>
+          <Link href="/forgot-password" passHref>
+            Forgot your password?
+          </Link>
+        </Typography>
       </Box>
     </Container>
   )

@@ -5,10 +5,13 @@ import { createClient } from "@/utils/supabase/client"
 import { Container, Box, Typography, CircularProgress, Button } from "@mui/material"
 import Image from "next/image"
 import Link from "next/link"
+import { formatDistanceToNow } from "date-fns"
 
 export default function LandingPage() {
   const supabase = createClient()
-  const [images, setImages] = useState<{ id: string; image_url: string }[]>([])
+  const [images, setImages] = useState<
+    { id: string; image_url: string; created_at: string; user_id: string; username: string }[]
+  >([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -16,13 +19,14 @@ export default function LandingPage() {
       setLoading(true)
       const { data, error } = await supabase
         .from("gallery")
-        .select("id, image_url")
+        .select("id, image_url, created_at, user_id")
         .order("created_at", { ascending: false })
-        .limit(6) // Get only the latest 6 images
+        .limit(6)
 
       if (error) {
-        console.error("Error fetching images:", error)
+        console.error("🚨 Supabase Error:", error)
       } else {
+        console.log("✅ Fetched images:", data)
         setImages(data || [])
       }
 
@@ -69,7 +73,7 @@ export default function LandingPage() {
         }}
       >
         {images.map(image => (
-          <Box key={image.id} sx={{ position: "relative", borderRadius: "8px", overflow: "hidden" }}>
+          <Box key={image.id} sx={{ borderRadius: "8px", overflow: "hidden", textAlign: "center" }}>
             <Image
               src={image.image_url}
               alt="Gallery Image"
@@ -79,6 +83,9 @@ export default function LandingPage() {
               objectFit="cover"
               style={{ borderRadius: "8px" }}
             />
+            <Typography variant="caption" color="text.secondary">
+              Uploaded {formatDistanceToNow(new Date(image.created_at), { addSuffix: true })} by {image.username}
+            </Typography>
           </Box>
         ))}
       </Box>
