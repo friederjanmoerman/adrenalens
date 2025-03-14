@@ -3,6 +3,7 @@
 import React, { useState } from "react"
 import { createClient } from "@/utils/supabase/client"
 import { Button, Box, CircularProgress, Typography } from "@mui/material"
+import Image from "next/image"
 
 export default function ImageUpload({ userId, onUpload }: { userId: string | null; onUpload: (url: string) => void }) {
   const supabase = createClient()
@@ -53,7 +54,17 @@ export default function ImageUpload({ userId, onUpload }: { userId: string | nul
   return (
     <Box display="flex" flexDirection="column" alignItems="center" gap={2}>
       {imageUrl && (
-        <img src={imageUrl} alt="Uploaded" style={{ width: "100%", maxHeight: "300px", objectFit: "cover" }} />
+        <Image
+          src={imageUrl}
+          alt="Uploaded"
+          width={600}
+          height={300}
+          style={{
+            width: "100%",
+            maxHeight: "300px",
+            objectFit: "cover",
+          }}
+        />
       )}
       <Button
         variant="contained"
